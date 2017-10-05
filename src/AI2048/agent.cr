@@ -1,0 +1,70 @@
+require "./board"
+
+abstract class Agent
+  property prop
+
+  def initialize(args : String = "")
+    @prop = Hash(String, String).new
+    args.sub(/ +/, ' ').split(' ').map(&.split('=')).map { |e| @prop[e[0]] = e[1] if !e[0].empty? && !e[1].empty? }
+  end
+
+  def open_episode(flag : String = "")
+  end
+
+  def close_episode(flag : String = "")
+  end
+
+  def name
+    @prop["name"]? ? @prop["name"] : "unknown"
+  end
+
+  abstract def take_action(b : Board)
+
+  def check_for_win(b : Board)
+    false
+  end
+end
+
+class RandomEnvironment < Agent
+  property engine
+
+  def initialize(args : String = "")
+    super("name=rndenv " + args)
+    @engine = Random.new
+    if @prop["seed"]?
+      @engine = Random.new(@prop["seed"].to_i)
+    end
+    @pos = StaticArray(Int32, 16).new { |i| i }
+  end
+
+  def take_action(b : Board)
+    @pos.shuffle!(@engine).map do |e|
+      next if b[e] != 0
+      pop_tile = @engine.rand < POP_TILE_WITH_ONE_RATE ? 1 : 2
+      return Action.new pos: e, place: pop_tile
+    end
+    Action.new
+  end
+end
+
+class Player < Agent
+  property engine
+
+  def initialize(args : String)
+    super("name=player " + args)
+    @engine = Random.new
+    if @prop["seed"]?
+      @engine = Random.new(@prop["seed"].to_i)
+    end    
+  end
+
+  def take_action(b : Board)
+    opcode = {0, 1, 2, 3}
+    opcode.each do |op|
+      if b.can_move?(op)
+        return Action.new move_op: op
+      end
+    end
+    Action.new
+  end
+end
