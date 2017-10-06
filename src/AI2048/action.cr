@@ -17,11 +17,11 @@ struct Action
     @opcode
   end
 
-  def apply!(b : Board)
+  def apply!(b : Board*)
     if (0b11 & @opcode) == @opcode # human
-      b.move!(@opcode) 
-    elsif (b[@opcode & 0x0f]) == 0
-      b[@opcode & 0x0f] = @opcode >> 4
+      b.value.move!(@opcode) 
+    elsif (b.value[@opcode & 0x0f]) == 0
+      b.value[@opcode & 0x0f] = @opcode >> 4
       0
     else
       -1

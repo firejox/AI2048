@@ -1,6 +1,6 @@
 require "./environment"
 
-class Board
+struct Board
   property board : StaticArray(Int32, 16)
 
   def initialize(@board : StaticArray(Int32, 16) = StaticArray(Int32, 16).new 0)

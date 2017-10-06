@@ -14,13 +14,13 @@ class Statistic
   def show
     block = Math.min(@data.size, @block)
     sum, max, opc, duration = 0, 0, 0, 0
-    stat = Array.new({{TILE_MAPPING.args.size}}, 0)
+    stat = {{ "StaticArray(Int32, #{TILE_MAPPING.args.size}).new(0)".id }}
     iter = @data.reverse_each
 
     block.times do |i|
       path = iter.next.as(Record)
       game = Board.new
-      score = path.actions.sum { |action| action.apply!(game) }
+      score = path.actions.sum { |action| action.apply!(pointerof(game)) }
       sum += score
       max = Math.max(score, max)
       opc += (path.actions.size - 2) / 2
@@ -45,7 +45,7 @@ class Statistic
         t += 1
         next
       end
-      accu = stat[t..({{TILE_MAPPING.args.size}})].sum
+      accu = stat.each.skip(t).sum
       puts "\t%d\t%.2f%%\t(%.2f%%)" % [TILE_MAPPING[t], accu * coef, stat[t] * coef]
       c += stat[t]
       t += 1
@@ -57,6 +57,12 @@ class Statistic
     @data.size >= @total
   end
 
+  def run_until_finished
+    @total.times do
+      with self yield
+    end
+  end
+
   def open_episode(&block)
     @data << Record.new
     @data[-1].tick
@@ -64,7 +70,11 @@ class Statistic
     yield
     
     @data[-1].tock
-    show if @data.size % @block == 0
+    
+    if @data.size % @block == 0
+      show
+      @data.clear
+    end
   end
 
   def save_action(move : Action)
