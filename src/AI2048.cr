@@ -22,27 +22,47 @@ end
 
 #player = Player.new player_args
 evil = RandomEnvironment.new evil_args
-ai_aco = AIACO.new "ant_num=50"
+#ai_aco = AIACO.new "ant_num=50"
+ai_td = AITD.new ""
 
 stat = Statistic.new(total, block)
 
 stat.run_until_finished do
   open_episode do
+    game_prev_prev_state = Board.new
+    game_prev_state = Board.new
     game = Board.new
+    r = 0
+    mov_op = -1
+
     score = 0
     loop do
-      who = take_turns(ai_aco, evil)
+      # who = take_turns(ai_aco, evil)
+      who = take_turns(ai_td, evil)
       action = who.take_action(game)
+
+      if who != evil
+        game_prev_prev_state = game
+        mov_op = action.to_i
+      end
 
       delta_score = action.apply!(pointerof(game))
       break if delta_score == -1
+
+      if who != evil
+        game_prev_state = game
+        r = delta_score
+      else
+        ai_td.learning game_prev_prev_state.to_slice, mov_op, r, game_prev_state.to_slice, game.to_slice
+      end
       
       save_action(action)
-      ai_aco.save_action(action)
+#      ai_aco.save_action(action)
       score += delta_score
     end
-    winner = last_turns(ai_aco, evil)
-    ai_aco.update_pheromons(score)
+    winner = last_turns(ai_td, evil)
+    # winner = last_turns(ai_aco, evil)
+    # ai_aco.update_pheromons(score)
   end
 end
 

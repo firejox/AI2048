@@ -1,4 +1,5 @@
 require "./approx_func"
+require "./board"
 
 class Synapse
   property weight = 0.0

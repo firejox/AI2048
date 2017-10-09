@@ -1,21 +1,19 @@
 require "./neural_net"
 
 class DeepNetwork < NeuralNetwork
-  getter input_layer : StaticArray(Neuron, 17)
+  getter input_layer : StaticArray(Neuron, 16)
   getter hidden_layers : StaticArray(StaticArray(Neuron, 16), 9)
   getter output_layer : StaticArray(Neuron, 1)
 
   def initialize
-    @input_layer = StaticArray(Neuron, 17).new { Neuron.new }
+    @input_layer = StaticArray(Neuron, 16).new { Neuron.new }
     @output_layer = StaticArray(Neuron, 1).new { Neuron.new }
     @hidden_layers = StaticArray(StaticArray(Neuron, 16), 9).new { StaticArray(Neuron, 16).new { Neuron.new } }
 
-    @input_layer.each do |a|
-      @hidden_layers[0].each do |b|
-        synapse = Synapse.new(a, b)
-        b.synapses_in << synapse
-        a.synapses_out << synapse
-      end
+    @input_layer.zip(@hidden_layers[0]) do |a, b|
+      synapse = Synapse.new(a, b)
+      b.synapses_in << synapse
+      a.synapses_out << synapse
     end
 
     gap = 4
@@ -155,7 +153,9 @@ class DeepNetwork < NeuralNetwork
   end
 
   def parameter_size
-    689
+    i = 0
+    parameters { i += 1 }
+    i
   end
 
   def tuning(by targets)

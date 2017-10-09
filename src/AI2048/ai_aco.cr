@@ -16,7 +16,7 @@ end
 
 class AIACO < Agent
   EVAPORATION_RATE = 0.3
-  DECAY_RATE = 0.2
+  DECAY_RATE = 0.3
   EXPLOITATION_RATE = 0.9
 
   property engine
@@ -36,9 +36,7 @@ class AIACO < Agent
     @count = @ant_num
 
     @pheromon_map = DeepNetwork.new
-    @pheromon_map.update_parameters do
-      @engine.rand(1e-4)
-    end
+    @pheromon_map.update_parameters { @engine.rand(1e-4) }
   end
 
   def save_action(action)
@@ -57,6 +55,8 @@ class AIACO < Agent
     @cur_ant.score = 0
 
     return if @count > 0
+    
+    @count = @ant_num
 
     delta = Math.log2(@elite_ant.score)
 
@@ -75,9 +75,10 @@ class AIACO < Agent
       a = iter.next
       unless a.is_a?(Iterator::Stop)
         action = a.as(Action)
-        ph = @pheromon_map.eval(board.each.chain(Iterator.of(action.to_i)))[0]
-        @pheromon_map.tuning by: StaticArray[(delta + ph)]
         action.apply!(pointerof(board))
+        
+        ph = @pheromon_map.eval(board.to_slice)[0]
+        @pheromon_map.tuning by: StaticArray[(delta + ph)]
 
         a = iter.next
       end
@@ -86,15 +87,17 @@ class AIACO < Agent
 
       a.as(Action).apply!(pointerof(board))
     end
+    @elite_ant.score = 0
   end
 
   def take_action(b : Board)
     branch_probs = StaticArray(Float64, 4).new(0.0)
     4.times do |op|
       if b.can_move?(op)
-        branch_probs[op] = Math.max(@pheromon_map.eval(b.each.chain(Iterator.of(op)))[0], 1.0)
         tmp = b
-        branch_probs[op] *= (tmp.move!(op) + 1)**2
+        score = Math.max(tmp.move!(op), 1)
+        branch_probs[op] = Math.max(@pheromon_map.eval(tmp.to_slice)[0], 1.0)
+        branch_probs[op] *= score**2
       end
     end
 
@@ -113,8 +116,9 @@ class AIACO < Agent
           op = i
         end
       end
+      b.move!(op)
 
-      val = @pheromon_map.eval(b.each.chain(Iterator.of(op)))[0]
+      val = @pheromon_map.eval(b.to_slice)[0]
       @pheromon_map.tuning by: StaticArray[val * (1.0 - DECAY_RATE) + DECAY_RATE * 1.0]
 
       Action.new move_op: op
@@ -127,7 +131,8 @@ class AIACO < Agent
         op += 1
       end
 
-      val = @pheromon_map.eval(b.each.chain(Iterator.of(op)))[0]
+      b.move!(op)
+      val = @pheromon_map.eval(b.to_slice)[0]
       @pheromon_map.tuning by: StaticArray[val * (1.0 - DECAY_RATE) + DECAY_RATE * 1.0]
 
       Action.new move_op: op

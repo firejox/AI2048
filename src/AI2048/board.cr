@@ -1,6 +1,8 @@
 require "./environment"
 
 struct Board
+  include Indexable(Int32)
+
   property board : StaticArray(Int32, 16)
 
   def initialize(@board : StaticArray(Int32, 16) = StaticArray(Int32, 16).new 0)
@@ -12,6 +14,14 @@ struct Board
 
   def ==(b : StaticArray(Int32, 16))
     board == b
+  end
+
+  def size
+    16
+  end
+
+  def unsafe_at(index : Int)
+    @board[index]
   end
 
   def [](tile_number)
@@ -105,6 +115,10 @@ struct Board
       io << tile
       io << (idx & 3) == 3 ? '\n' : '\t'
     end
+  end
+
+  def to_slice
+    @board.to_slice
   end
 
   def move_left!
