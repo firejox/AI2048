@@ -14,16 +14,16 @@ OptionParser.parse! do |parser|
   parser.on("--block=BLOCK", "...") { |n| block = n.to_i }
   parser.on("--play=PLAYER_ARGS", "The arguments of player initialization") { |args| player_args = args }
   parser.on("--evil=EVIL_ARGS", "The arguments of evil (environment) initialization") { |args| evil_args = args }
-  #parser.on("--load=LOAD", "Specifies the name to salute") { |name| load = name }
+  # parser.on("--load=LOAD", "Specifies the name to salute") { |name| load = name }
   parser.on("--save=SAVE", "Path to save statistic data") { |path| save = path }
-  #parser.on("--summary", "Specifies the name to salute") { summary = true }
+  # parser.on("--summary", "Specifies the name to salute") { summary = true }
   parser.on("-h", "--help", "Show this help") { puts parser }
 end
 
-#player = Player.new player_args
+# player = Player.new player_args
 evil = RandomEnvironment.new evil_args
-#ai_aco = AIACO.new "ant_num=50"
-ai_td = AITD.new ""
+ai_aco = AIACO.new "ant_num=10"
+# ai_td = AITD.new ""
 
 stat = Statistic.new(total, block)
 
@@ -37,8 +37,8 @@ stat.run_until_finished do
 
     score = 0
     loop do
-      # who = take_turns(ai_aco, evil)
-      who = take_turns(ai_td, evil)
+      who = take_turns(ai_aco, evil)
+      # who = take_turns(ai_td, evil)
       action = who.take_action(game)
 
       if who != evil
@@ -53,16 +53,16 @@ stat.run_until_finished do
         game_prev_state = game
         r = delta_score
       else
-        ai_td.learning game_prev_prev_state.to_slice, mov_op, r, game_prev_state.to_slice, game.to_slice
+        ai_aco.learning game_prev_prev_state.to_slice, mov_op, r, game_prev_state.to_slice, game.to_slice
       end
-      
+
       save_action(action)
-#      ai_aco.save_action(action)
+      ai_aco.save_action(action)
       score += delta_score
     end
-    winner = last_turns(ai_td, evil)
-    # winner = last_turns(ai_aco, evil)
-    # ai_aco.update_pheromons(score)
+    # winner = last_turns(ai_td, evil)
+    winner = last_turns(ai_aco, evil)
+    ai_aco.update_pheromons(score)
   end
 end
 

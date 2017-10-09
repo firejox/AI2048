@@ -24,19 +24,19 @@ class DeepNetwork < NeuralNetwork
           synapse = Synapse.new(@hidden_layers[k - 1][i*4 + j], @hidden_layers[k][i*4 + j])
           @hidden_layers[k - 1][i*4 + j].synapses_out << synapse
           @hidden_layers[k][i*4 + j].synapses_in << synapse
-          
-          synapse = Synapse.new(@hidden_layers[k - 1][i*4 + j^gap], @hidden_layers[k][i*4 + j])
 
-          @hidden_layers[k - 1][i*4 + j^gap].synapses_out << synapse
+          synapse = Synapse.new(@hidden_layers[k - 1][i*4 + j ^ gap], @hidden_layers[k][i*4 + j])
+
+          @hidden_layers[k - 1][i*4 + j ^ gap].synapses_out << synapse
           @hidden_layers[k][i*4 + j].synapses_in << synapse
 
           synapse = Synapse.new(@hidden_layers[k][i*4 + j], @hidden_layers[k + 1][i*4 + j])
           @hidden_layers[k][i*4 + j].synapses_out << synapse
           @hidden_layers[k + 1][i*4 + j].synapses_in << synapse
 
-          synapse = Synapse.new(@hidden_layers[k - 1][(i^gap)*4 + j], @hidden_layers[k][i*4 + j])
+          synapse = Synapse.new(@hidden_layers[k - 1][(i ^ gap)*4 + j], @hidden_layers[k][i*4 + j])
 
-          @hidden_layers[k][(i^gap)*4 + j].synapses_out << synapse
+          @hidden_layers[k][(i ^ gap)*4 + j].synapses_out << synapse
           @hidden_layers[k + 1][i*4 + j].synapses_in << synapse
         end
       end
@@ -48,23 +48,23 @@ class DeepNetwork < NeuralNetwork
           synapse = Synapse.new(@hidden_layers[k - 1][i*4 + j], @hidden_layers[k][i*4 + j])
           @hidden_layers[k - 1][i*4 + j].synapses_out << synapse
           @hidden_layers[k][i*4 + j].synapses_in << synapse
-          
-          synapse = Synapse.new(@hidden_layers[k - 1][i*4 + j^gap], @hidden_layers[k][i*4 + j])
 
-          @hidden_layers[k - 1][i*4 + j^gap].synapses_out << synapse
+          synapse = Synapse.new(@hidden_layers[k - 1][i*4 + j ^ gap], @hidden_layers[k][i*4 + j])
+
+          @hidden_layers[k - 1][i*4 + j ^ gap].synapses_out << synapse
           @hidden_layers[k][i*4 + j].synapses_in << synapse
 
           synapse = Synapse.new(@hidden_layers[k][i*4 + j], @hidden_layers[k + 1][i*4 + j])
           @hidden_layers[k][i*4 + j].synapses_out << synapse
           @hidden_layers[k + 1][i*4 + j].synapses_in << synapse
 
-          synapse = Synapse.new(@hidden_layers[k - 1][(i^gap)*4 + j], @hidden_layers[k][i*4 + j])
+          synapse = Synapse.new(@hidden_layers[k - 1][(i ^ gap)*4 + j], @hidden_layers[k][i*4 + j])
 
-          @hidden_layers[k][(i^gap)*4 + j].synapses_out << synapse
+          @hidden_layers[k][(i ^ gap)*4 + j].synapses_out << synapse
           @hidden_layers[k + 1][i*4 + j].synapses_in << synapse
         end
       end
-      gap <<= 1 
+      gap <<= 1
     end
 
     @hidden_layers[-1].each do |a|

@@ -55,7 +55,7 @@ class Player < Agent
     @engine = Random.new
     if @prop["seed"]?
       @engine = Random.new(@prop["seed"].to_i)
-    end    
+    end
   end
 
   def take_action(b : Board)

@@ -1,11 +1,9 @@
 require "./environment"
 
 struct Board
-  include Indexable(Int32)
-
   property board : StaticArray(Int32, 16)
 
-  def initialize(@board : StaticArray(Int32, 16) = StaticArray(Int32, 16).new 0)
+  def initialize(@board = StaticArray(Int32, 16).new(0))
   end
 
   def ==(b : Board)

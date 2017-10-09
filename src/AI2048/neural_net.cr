@@ -20,7 +20,6 @@ class Neuron
   property output = 0.0
   property error = 0.0
 
-
   def calculate_output
     activation = @synapses_in.sum(-@threshold) do |synapse|
       synapse.src_neuron.output * synapse.weight

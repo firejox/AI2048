@@ -2,9 +2,10 @@ require "./agent"
 require "./lookup_table"
 
 class AITD < Agent
-  LEARNING_RATE = 0.001
+  LEARNING_RATE = 0.04
 
   @state_func : LookUpTable
+
   def initialize(args : String)
     super("name=aitd " + args)
     @state_func = LookUpTable.new
@@ -40,7 +41,7 @@ class AITD < Agent
         b[i] = 1
         expect += POP_TILE_WITH_ONE_RATE * @state_func.eval b.to_slice
         b[i] = 2
-        expect += (1.0 - POP_TILE_WITH_TWO_RATE) * @state_func.eval b.to_slice
+        expect += POP_TILE_WITH_TWO_RATE * @state_func.eval b.to_slice
         b[i] = 0
         count += 1
       end
